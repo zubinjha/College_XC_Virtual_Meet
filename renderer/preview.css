@@ -8,14 +8,15 @@ h1 {
   margin-bottom: 1rem;
 }
 
+/* give the individual table more room */
 .tables-container {
   display: flex;
   gap: 20px;
 }
 
-/* Each table gets its own scroll region */
 .individual-container,
 .team-container {
+  position: relative;
   background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -23,9 +24,8 @@ h1 {
   overflow-y: auto;
 }
 
-/* flex:2 vs flex:1 to give runners more room */
 .individual-container {
-  flex: 2;
+  flex: 3;            /* was 2, now a bit wider */
   max-height: 75vh;
 }
 
@@ -34,20 +34,33 @@ h1 {
   max-height: 75vh;
 }
 
-/* Table basics */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-thead th {
+/* keep section titles frozen at top */
+.individual-container h2,
+.team-container h2 {
   position: sticky;
   top: 0;
-  background: #f3f3f1;      /* TFRRS light grey header */
-  color: #2e662b;           /* TFRRS green */
+  margin: 0 0 8px;
+  padding: 8px 0;
+  background: white;
+  z-index: 3;
+}
+
+/* table header sticky just below the h2 */
+thead th {
+  position: sticky;
+  top: 40px;          /* height of h2 + margin */
+  background: #f3f3f1;
+  color: #2e662b;
   font-weight: bold;
   padding: 8px;
   border-bottom: 1px solid #bbb;
+  z-index: 2;
+}
+
+/* basic table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
 tbody td {
@@ -56,7 +69,34 @@ tbody td {
   font-size: 0.95rem;
 }
 
-/* Even-row shading */
 tbody tr:nth-child(even) {
   background: #fafafa;
+}
+
+/* delete button styling */
+.delete-btn {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 6px;
+  color: #c00;
+}
+
+/* Add-runner form */
+.add-runner-form {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.add-runner-form input {
+  padding: 4px 6px;
+  font-size: 0.95rem;
+}
+
+.add-runner-form button {
+  padding: 6px 12px;
 }
