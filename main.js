@@ -1,7 +1,7 @@
 // main.js
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-const { scrapeMeet } = require('./scraper/scrape.js')  // your scraper logic
+const { scrapeMeet } = require('./scraper/scrape.js')
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -13,7 +13,6 @@ function createWindow() {
       nodeIntegration: false
     }
   })
-
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'))
 }
 
@@ -28,7 +27,6 @@ ipcMain.handle('scrape-url', async (_, url) => {
 })
 
 app.whenReady().then(createWindow)
-
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })

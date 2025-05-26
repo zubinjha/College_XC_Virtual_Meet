@@ -1,114 +1,155 @@
 // renderer/index.js
-// must match preload.exposeInMainWorld key:
-const { scrapeMeet } = window.api;
 
-let tablesByName = {};
-let selectedRaceName = '';
+// 1) grab only the scrapeMeet bridge
+const { scrapeMeet } = window.api
+
+// 2) inline your Runner / Team / Meet classes here:
+class Runner {
+  constructor(name, place, time) {
+    this.name = name
+    this.place = place
+    this.time = time    // minutes (float)
+    this.effectivePlace = null
+    this.points = null
+  }
+}
+
+class Team {
+  constructor(name) {
+    this.name = name
+    this.runners = []
+    this.scoreList = []
+    this.score = null
+  }
+  addRunner(runner) {
+    this.runners.push(runner)
+  }
+  calculateScore() {
+    const places = this.runners
+      .map(r=>r.effectivePlace)
+      .filter(p=>typeof p==='number')
+      .sort((a,b)=>a-b)
+    this.scoreList = places.slice(0,5)
+    this.score = this.scoreList.length===5
+      ? this.scoreList.reduce((sum,p)=>sum+p,0)
+      : null
+  }
+}
+
+class Meet {
+  constructor() { this.teams = [] }
+  addTeam(t) { this.teams.push(t) }
+  calculateAllTeamScores() {
+    this.teams.forEach(t=>t.calculateScore())
+    this.teams.sort((a,b)=>{
+      if (a.score==null) return 1
+      if (b.score==null) return -1
+      return a.score - b.score
+    })
+  }
+}
+
+// 3) your app state:
+let tablesByName = {}
+let selectedRaceName = ''
+const meet = new Meet()
+
+// 4) DOM refs:
+const step1      = document.getElementById('step1')
+const step2      = document.getElementById('step2')
+const step3      = document.getElementById('step3')
+const loadBtn    = document.getElementById('loadBtn')
+const previewBtn = document.getElementById('previewBtn')
+const toTeams    = document.getElementById('toTeams')
+const importBtn  = document.getElementById('importBtn')
+const errDiv     = document.getElementById('step1Error')
 
 // STEP 1 → load & scrape
-document.getElementById('loadBtn')
-  .addEventListener('click', async () => {
-    const url = document.getElementById('urlInput').value.trim();
-    const errDiv = document.getElementById('step1Error');
-    errDiv.textContent = '';
-    if (!url) {
-      errDiv.textContent = 'Please enter a meet URL.';
-      return;
+loadBtn.addEventListener('click', async () => {
+  errDiv.textContent = ''
+  const url = document.getElementById('urlInput').value.trim()
+  if (!url) return errDiv.textContent = 'Please enter a meet URL.'
+  const res = await scrapeMeet(url)
+  if (!res || !res.success) {
+    return errDiv.textContent = 'Fetch failed. Check console.'
+  }
+  tablesByName = res.data.tables
+
+  // build the race‐radio list
+  const rf = document.getElementById('raceForm')
+  rf.innerHTML = ''
+  Object.keys(tablesByName).forEach(name => {
+    const lbl = document.createElement('label')
+    const r   = document.createElement('input')
+    r.type = 'radio';  r.name = 'race';  r.value = name
+    r.onchange = () => { selectedRaceName = name; toTeams.disabled = false }
+    lbl.appendChild(r)
+    lbl.append(name)
+    rf.appendChild(lbl)
+  })
+
+  step1.classList.add('hidden')
+  step2.classList.remove('hidden')
+})
+
+// STEP 2 → pick race → show teams
+toTeams.addEventListener('click', () => {
+  const runners = tablesByName[selectedRaceName]
+  const teams   = Array.from(new Set(runners.map(r=>r.TEAM))).sort()
+  const tf = document.getElementById('teamForm')
+  tf.innerHTML = ''
+  teams.forEach(teamName => {
+    const lbl = document.createElement('label')
+    const cb  = document.createElement('input')
+    cb.type = 'checkbox'; cb.value = teamName
+    cb.onchange = () => {
+      importBtn.disabled = tf.querySelectorAll('input:checked').length===0
     }
+    lbl.appendChild(cb)
+    lbl.append(teamName)
+    tf.appendChild(lbl)
+  })
 
-    const resp = await scrapeMeet(url);
-    if (!resp || !resp.success && !resp.data) {
-      errDiv.textContent = 'Failed to fetch. Check console for errors.';
-      return;
+  step2.classList.add('hidden')
+  step3.classList.remove('hidden')
+})
+
+// STEP 3 → import into your in-memory Meet
+importBtn.addEventListener('click', () => {
+  const adjustSec = parseFloat(document.getElementById('adjustInput').value)||0
+  const pickedTeams = Array.from(
+    document.querySelectorAll('#teamForm input:checked')
+  ).map(cb=>cb.value)
+
+  const rows = tablesByName[selectedRaceName]
+                .filter(r=>pickedTeams.includes(r.TEAM))
+
+  rows.forEach(r => {
+    const time = r.TIME + (adjustSec/60)
+    const runner = new Runner(r.NAME, r.PLACE, time)
+    let team = meet.teams.find(t=>t.name===r.TEAM)
+    if (!team) {
+      team = new Team(r.TEAM)
+      meet.addTeam(team)
     }
-    const meet = resp.success ? resp.data : resp;
-    tablesByName = meet.tables;
+    team.addRunner(runner)
+  })
 
-    // build race radio buttons
-    const raceForm = document.getElementById('raceForm');
-    raceForm.innerHTML = '';
-    Object.keys(tablesByName).forEach(name => {
-      const label = document.createElement('label');
-      const r = document.createElement('input');
-      r.type = 'radio'; r.name = 'race'; r.value = name;
-      r.addEventListener('change', () => {
-        selectedRaceName = name;
-        document.getElementById('toTeams').disabled = false;
-      });
-      label.appendChild(r);
-      label.append(name);
-      raceForm.appendChild(label);
-    });
+  // recalc effectivePlace across all runners
+  const all = meet.teams.flatMap(t=>t.runners)
+  all.sort((a,b)=>a.time-b.time).forEach((r,i)=>r.effectivePlace = i+1)
+  meet.calculateAllTeamScores()
 
-    // show step 2
-    document.getElementById('step1').style.display = 'none';
-    document.getElementById('step2').style.display = 'block';
-  });
+  previewBtn.disabled = all.length===0
+  step3.classList.add('hidden')
+  step1.classList.remove('hidden')
 
-// STEP 2 → choose race → show teams
-document.getElementById('toTeams')
-  .addEventListener('click', () => {
-    if (!selectedRaceName) return;
 
-    const runners = tablesByName[selectedRaceName];
-    const teams = Array.from(
-      new Set(runners.map(r => r.TEAM).filter(Boolean))
-    ).sort((a, b) => a.localeCompare(b));
 
-    const teamForm = document.getElementById('teamForm');
-    teamForm.innerHTML = '';
-    teams.forEach(team => {
-      const label = document.createElement('label');
-      const cb = document.createElement('input');
-      cb.type = 'checkbox'; cb.value = team;
-      cb.addEventListener('change', () => {
-        const any = teamForm.querySelectorAll('input:checked').length > 0;
-        document.getElementById('importBtn').disabled = !any;
-      });
-      label.appendChild(cb);
-      label.append(team);
-      teamForm.appendChild(label);
-    });
+  alert(`Imported ${rows.length} runners.\nTotal now: ${all.length}`)
+})
 
-    document.getElementById('step2').style.display = 'none';
-    document.getElementById('step3').style.display = 'block';
-  });
-
-// STEP 3 → import → reset back to STEP 1
-document.getElementById('importBtn')
-  .addEventListener('click', () => {
-    const picked = Array.from(
-      document.querySelectorAll('#teamForm input:checked')
-    ).map(cb => cb.value);
-
-    let runners = tablesByName[selectedRaceName]
-      .filter(r => picked.includes(r.TEAM));
-
-    // apply seconds→minutes adjustment
-    const sec = parseFloat(document.getElementById('adjustInput').value) || 0;
-    const delta = sec / 60;
-    runners = runners.map(r => ({
-      ...r,
-      TIME: +(r.TIME + delta).toFixed(3)
-    }));
-
-    console.log('Imported race:', selectedRaceName);
-    console.log('Teams:', picked);
-    console.log('Runners (with adjusted times):', runners);
-
-    alert(`
-      Imported "${selectedRaceName}"
-      Teams: ${picked.join(', ')}
-      Runners: ${runners.length}
-    `);
-
-    // reset UI to step 1
-    document.getElementById('step3').style.display = 'none';
-    document.getElementById('step2').style.display = 'none';
-    document.getElementById('step1').style.display = 'block';
-    document.getElementById('toTeams').disabled = true;
-    document.getElementById('importBtn').disabled = true;
-    document.getElementById('urlInput').value = '';
-    selectedRaceName = '';
-    tablesByName = {};
-  });
+// “Preview Virtual Meet”
+previewBtn.addEventListener('click', () => {
+  window.location.href = 'preview.html'
+})
