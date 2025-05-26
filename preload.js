@@ -1,8 +1,6 @@
 // preload.js
-const { contextBridge } = require('electron')
-// instead of require('path') + path.join(...), just pull in your scraper:
-const { scrapeMeet } = require('./scraper/scrape')
+const { contextBridge, ipcRenderer } = require('electron')
 
-contextBridge.exposeInMainWorld('electronAPI', {
-  scrapeMeet
+contextBridge.exposeInMainWorld('api', {
+  scrapeMeet: url => ipcRenderer.invoke('scrape-url', url)
 })
