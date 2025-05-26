@@ -3,10 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>XC Importer</title>
-    <style>
-      body { font-family: sans-serif; padding: 20px; }
-      label, input, button { display: block; margin: 8px 0; }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <h1>Cross-Country Import</h1>
@@ -14,23 +11,30 @@
     <!-- STEP 1: URL -->
     <div id="step1">
       <label for="urlInput">TFRRS Meet URL:</label>
-      <input id="urlInput" type="text" size="60" placeholder="https://www.tfrrs.org/results/…"/>
+      <input
+        id="urlInput"
+        type="text"
+        size="60"
+        placeholder="https://www.tfrrs.org/results/…"
+      />
       <button id="loadBtn">Load Meet</button>
-      <div id="step1Error" style="color:red;"></div>
+      <div id="step1Error" class="error"></div>
     </div>
 
     <!-- STEP 2: pick one race -->
-    <div id="step2" style="display:none;">
+    <div id="step2" class="hidden">
       <h2>Select Race</h2>
       <form id="raceForm"></form>
       <button id="toTeams" disabled>Next → Teams</button>
     </div>
 
-    <!-- STEP 3: pick teams -->
-    <div id="step3" style="display:none;">
+    <!-- STEP 3: pick teams + adjustment -->
+    <div id="step3" class="hidden">
       <h2>Select Teams</h2>
+      <label for="adjustInput">Time adjustment (seconds):</label>
+      <input id="adjustInput" type="number" value="0" />
       <form id="teamForm"></form>
-      <button id="importBtn" disabled>Import</button>
+      <button id="importBtn" disabled>Import Race</button>
     </div>
 
     <script src="index.js"></script>

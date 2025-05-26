@@ -15,15 +15,15 @@ function createWindow() {
   })
 
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'))
-  // win.webContents.openDevTools()
 }
 
 ipcMain.handle('scrape-url', async (_, url) => {
   try {
     const data = await scrapeMeet(url)
     return { success: true, data }
-  } catch (e) {
-    return { success: false, error: e.message }
+  } catch (err) {
+    console.error(err)
+    return { success: false, error: err.message }
   }
 })
 
