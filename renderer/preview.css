@@ -1,0 +1,62 @@
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.tables-container {
+  display: flex;
+  gap: 20px;
+}
+
+/* Each table gets its own scroll region */
+.individual-container,
+.team-container {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+/* flex:2 vs flex:1 to give runners more room */
+.individual-container {
+  flex: 2;
+  max-height: 75vh;
+}
+
+.team-container {
+  flex: 1;
+  max-height: 75vh;
+}
+
+/* Table basics */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: #f3f3f1;      /* TFRRS light grey header */
+  color: #2e662b;           /* TFRRS green */
+  font-weight: bold;
+  padding: 8px;
+  border-bottom: 1px solid #bbb;
+}
+
+tbody td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+/* Even-row shading */
+tbody tr:nth-child(even) {
+  background: #fafafa;
+}
