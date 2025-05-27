@@ -102,3 +102,18 @@ tbody tr:nth-child(even) {
 .add-runner-form button {
   padding: 6px 12px;
 }
+
+/* make the body a positioned container */
+body {
+  position: relative;
+}
+
+/* reposition and shrink the save button */
+#saveExcelBtn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  padding: 4px 8px;      /* smaller hit area */
+  font-size: 0.85rem;     /* a bit smaller text */
+  line-height: 1;
+}

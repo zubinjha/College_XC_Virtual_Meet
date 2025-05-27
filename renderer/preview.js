@@ -93,6 +93,33 @@ class Meet {
 // build meet
 const meet = new Meet(snapshot);
 
+// Hook up the existing “Save as Excel” button
+const saveBtn = document.getElementById('saveExcelBtn');
+saveBtn.addEventListener('click', async () => {
+  // Prepare individual rows
+  const individuals = meet.teams
+    .flatMap(team => team.runners.map(r => ({
+      Place: r.effectivePlace || '',
+      Name: r.name,
+      Team: r.team,
+      Time: formatTime(r.time),
+      Points: r.points != null ? r.points : ''
+    })));
+
+  // Prepare team rows
+  const teams = meet.teams.map((t, i) => ({
+    Place: i + 1,
+    Team: t.name,
+    Score: t.score != null ? t.score : ''
+  }));
+
+  // Send to main for saving
+  const result = await window.api.saveMeet({ individuals, teams });
+  if (!result.success) {
+    alert('Save failed: ' + result.error);
+  }
+});
+
 // DOM refs
 const indBody = document.querySelector('#ind-table tbody');
 const teamBody = document.querySelector('#team-table tbody');
