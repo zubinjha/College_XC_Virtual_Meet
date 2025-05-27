@@ -58,29 +58,24 @@ class Meet {
     this.recalcAll();
   }
   recalcAll() {
-    // per-team sort & mark displacers
     this.teams.forEach(team => {
       team.runners.sort((a, b) => a.time - b.time);
       team.runners.forEach((r, idx) => (r.isDisplacer = idx < 7));
     });
-    // global effective places
     const displacers = this.teams
       .flatMap(team => team.runners.filter(r => r.isDisplacer))
       .sort((a, b) => a.time - b.time);
     displacers.forEach((r, i) => (r.effectivePlace = i + 1));
-    // non-displacers get null
     this.teams
       .flatMap(team => team.runners)
       .filter(r => !r.isDisplacer)
       .forEach(r => (r.effectivePlace = null));
-    // assign points & calc team score
     this.teams.forEach(team => {
       team.runners.forEach((r, idx) => {
         r.points = idx < 5 && r.effectivePlace != null ? r.effectivePlace : null;
       });
       team.calculateScore();
     });
-    // drop empty & sort teams by score
     this.teams = this.teams.filter(t => t.runners.length);
     this.teams.sort((a, b) => {
       if (a.score == null) return 1;
@@ -96,7 +91,6 @@ const meet = new Meet(snapshot);
 // Hook up the existing “Save as Excel” button
 const saveBtn = document.getElementById('saveExcelBtn');
 saveBtn.addEventListener('click', async () => {
-  // Prepare individual rows
   const individuals = meet.teams
     .flatMap(team => team.runners.map(r => ({
       Place: r.effectivePlace || '',
@@ -106,14 +100,12 @@ saveBtn.addEventListener('click', async () => {
       Points: r.points != null ? r.points : ''
     })));
 
-  // Prepare team rows
   const teams = meet.teams.map((t, i) => ({
     Place: i + 1,
     Team: t.name,
     Score: t.score != null ? t.score : ''
   }));
 
-  // Send to main for saving
   const result = await window.api.saveMeet({ individuals, teams });
   if (!result.success) {
     alert('Save failed: ' + result.error);
@@ -128,9 +120,7 @@ const inpName = document.getElementById('newName');
 const inpTeam = document.getElementById('newTeam');
 const inpPlace = document.getElementById('newPlace');
 
-// ------------------------------------------------------------------
 // Format decimal-minutes to mm:ss.d
-// ------------------------------------------------------------------
 function formatTime(t) {
   const minInt = Math.floor(t);
   const secondsTotal = (t - minInt) * 60;
@@ -143,7 +133,6 @@ function formatTime(t) {
 // render everything
 function render() {
   meet.recalcAll();
-  // flatten & sort by time
   const allRunners = meet.teams
     .flatMap(t => t.runners)
     .sort((a, b) => a.time - b.time);
@@ -163,49 +152,29 @@ function render() {
     };
     tr.appendChild(del);
 
-    // Place (editable, raw index)
+    // Place (using <input>)
     const tdP = document.createElement('td');
-    tdP.textContent = idx + 1;
-    tdP.contentEditable = true;
-    tdP.addEventListener('keypress', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const newPlace = parseInt(tdP.textContent) || idx + 1;
-        adjustTimeByPlace(r, newPlace, allRunners);
-        render();
-      }
+    const inpP = document.createElement('input');
+    inpP.type = 'number';
+    inpP.value = idx + 1;
+    inpP.min = '1';
+    inpP.style.width = '3em';
+    inpP.addEventListener('change', () => {
+      const newPlace = parseInt(inpP.value) || idx + 1;
+      adjustTimeByPlace(r, newPlace, allRunners);
+      render();
     });
+    tdP.appendChild(inpP);
     tr.appendChild(tdP);
 
-    // Name (editable)
+    // Name (non-editable)
     const tdN = document.createElement('td');
     tdN.textContent = r.name;
-    tdN.contentEditable = true;
-    tdN.addEventListener('blur', () => {
-      r.name = tdN.textContent.trim();
-      render();
-    });
     tr.appendChild(tdN);
 
-    // Team (editable)
+    // Team (non-editable)
     const tdT = document.createElement('td');
     tdT.textContent = r.team;
-    tdT.contentEditable = true;
-    tdT.addEventListener('blur', () => {
-      const old = r.team;
-      const nw = tdT.textContent.trim();
-      if (nw && nw !== old) {
-        r.team = nw;
-        const tOld = meet.teams.find(t => t.name === old);
-        let tNew = meet.teams.find(t => t.name === nw);
-        if (!tNew) {
-          tNew = new Team(nw);
-          meet.teams.push(tNew);
-        }
-        if (tOld) tOld.runners = tOld.runners.filter(x => x !== r);
-      }
-      render();
-    });
     tr.appendChild(tdT);
 
     // Time (read-only)
@@ -242,7 +211,6 @@ form.addEventListener('submit', e => {
   const place = parseInt(inpPlace.value);
   if (!name || !team || !place) return;
 
-  // create runner with placeholder time
   const placeholderTime = meet.teams
     .flatMap(t => t.runners.map(r => r.time))
     .reduce((m, t) => Math.max(m, t), 0) + 0.05;
@@ -254,7 +222,6 @@ form.addEventListener('submit', e => {
   }
   tm.runners.push(run);
 
-  // immediately adjust their time so they land at 'place'
   const all = meet.teams
     .flatMap(t => t.runners)
     .sort((a, b) => a.time - b.time);
@@ -278,10 +245,8 @@ function adjustTimeByPlace(runner, newPlace, sortedAll) {
   } else if (newPlace === n) {
     runner.time = timeAt(n - 1) + 0.05;
   } else if (movingDown) {
-    // when moving down, average between newPlace and one below
     runner.time = (timeAt(newPlace - 1) + timeAt(newPlace)) / 2;
   } else {
-    // moving up, average between one above and newPlace
     runner.time = (timeAt(newPlace - 2) + timeAt(newPlace - 1)) / 2;
   }
 }
