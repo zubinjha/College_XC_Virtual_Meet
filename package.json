@@ -4,7 +4,8 @@
   "description": "Cross Country Application",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder --mac"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,25 @@
     "electron-dialog": "^2.0.0",
     "exceljs": "^4.4.0",
     "xlsx": "^0.18.5"
+  },
+  "build": {
+    "appId": "com.zubinjha.xcwebapp",
+    "productName": "XC Web App",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "scraper/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "build/logo.png"
+    }
   }
 }
