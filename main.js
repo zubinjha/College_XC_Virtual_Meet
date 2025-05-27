@@ -1,4 +1,5 @@
-// At the top of main.js (if not already):
+// main.js
+
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -28,9 +29,8 @@ ipcMain.handle('scrape-url', async (_, url) => {
   }
 });
 
-// ← Add this block for saving Excel
 ipcMain.handle('save-meet', async (_, { individuals, teams }) => {
-  // Prompt user for save location
+  // 1) Prompt for save location
   const { filePath, canceled } = await dialog.showSaveDialog({
     title: 'Save Virtual Meet as Excel',
     defaultPath: 'virtual-meet.xlsx',
@@ -41,21 +41,64 @@ ipcMain.handle('save-meet', async (_, { individuals, teams }) => {
   }
 
   try {
-    // Create a new workbook
+    // 2) Build a single sheet with BOTH tables side by side
     const wb = XLSX.utils.book_new();
+    const rows = [];
 
-    // Convert JSON arrays to sheets
-    const wsIndividuals = XLSX.utils.json_to_sheet(individuals);
-    const wsTeams       = XLSX.utils.json_to_sheet(teams);
+    // 2a) Header row: A–E = individuals, F–G blank, H–J = teams
+    rows.push([
+      'Place', 'Name', 'Team', 'Time', 'Points',
+      '', '',
+      'Place', 'Team', 'Score'
+    ]);
 
-    // Append sheets
-    XLSX.utils.book_append_sheet(wb, wsIndividuals, 'Individuals');
-    XLSX.utils.book_append_sheet(wb, wsTeams,       'Teams');
+    // 2b) Data rows: up to the longer of the two lists
+    const maxRows = Math.max(individuals.length, teams.length);
+    for (let i = 0; i < maxRows; i++) {
+      const ind = individuals[i] || {};
+      const team = teams[i] || {};
+      rows.push([
+        ind.Place != null ? ind.Place : '',
+        ind.Name  || '',
+        ind.Team  || '',
+        ind.Time  || '',
+        ind.Points != null ? ind.Points : '',
+        '', '',
+        team.Place != null ? team.Place : '',
+        team.Team  || '',
+        team.Score != null ? team.Score : ''
+      ]);
+    }
 
-    // Write workbook to a Buffer
+    // 3) Convert rows to a worksheet
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+
+    // 4) Bold the top row and freeze it
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cellRef = XLSX.utils.encode_cell({ r: 0, c: C });
+      if (!ws[cellRef]) continue;
+      ws[cellRef].s = { font: { bold: true } };
+    }
+    ws['!freeze'] = { xSplit: '1', ySplit: '1' };
+
+    // 5) Set column widths: A=7.5, B=20, C=15, D=10, E=7.5, F,G untouched, H=15, I=7.5
+    ws['!cols'] = [
+      { wch: 7.5 },   // A
+      { wch: 20   },  // B
+      { wch: 15   },  // C
+      { wch: 10   },  // D
+      { wch: 7.5  },  // E
+      {},            // F
+      { wch: 7.5  },  // G (blank spacer)
+      { wch: 7.5   },  // H (team Place)
+      { wch: 15  },  // I (team Name)
+      {}             // J (team Score)
+    ];
+
+    // 6) Append, write, and save
+    XLSX.utils.book_append_sheet(wb, ws, 'Virtual Meet');
     const wbout = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
-
-    // Save Buffer to disk
     fs.writeFileSync(filePath, wbout);
 
     return { success: true };

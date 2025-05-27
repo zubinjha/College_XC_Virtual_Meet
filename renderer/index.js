@@ -26,24 +26,29 @@ class Team {
   }
   calculateScore() {
     const places = this.runners
-      .map(r=>r.effectivePlace)
-      .filter(p=>typeof p==='number')
-      .sort((a,b)=>a-b)
-    this.scoreList = places.slice(0,5)
-    this.score = this.scoreList.length===5
-      ? this.scoreList.reduce((sum,p)=>sum+p,0)
-      : null
+      .map(r => r.effectivePlace)
+      .filter(p => typeof p === 'number')
+      .sort((a, b) => a - b)
+    this.scoreList = places.slice(0, 5)
+    this.score =
+      this.scoreList.length === 5
+        ? this.scoreList.reduce((sum, p) => sum + p, 0)
+        : null
   }
 }
 
 class Meet {
-  constructor() { this.teams = [] }
-  addTeam(t) { this.teams.push(t) }
+  constructor() {
+    this.teams = []
+  }
+  addTeam(t) {
+    this.teams.push(t)
+  }
   calculateAllTeamScores() {
-    this.teams.forEach(t=>t.calculateScore())
-    this.teams.sort((a,b)=>{
-      if (a.score==null) return 1
-      if (b.score==null) return -1
+    this.teams.forEach(t => t.calculateScore())
+    this.teams.sort((a, b) => {
+      if (a.score == null) return 1
+      if (b.score == null) return -1
       return a.score - b.score
     })
   }
@@ -82,7 +87,9 @@ loadBtn.addEventListener('click', async () => {
   Object.keys(tablesByName).forEach(name => {
     const lbl = document.createElement('label')
     const r   = document.createElement('input')
-    r.type = 'radio';  r.name = 'race';  r.value = name
+    r.type = 'radio'
+    r.name = 'race'
+    r.value = name
     r.onchange = () => {
       selectedRaceName = name
       toTeams.disabled = false
@@ -99,16 +106,15 @@ loadBtn.addEventListener('click', async () => {
 // STEP 2 → pick race → show teams
 toTeams.addEventListener('click', () => {
   const runners = tablesByName[selectedRaceName]
-  const teams   = Array.from(
-    new Set(runners.map(r=>r.TEAM))
-  ).sort()
+  const teams   = Array.from(new Set(runners.map(r => r.TEAM))).sort()
   const tf = document.getElementById('teamForm')
   tf.innerHTML = ''
 
   teams.forEach(teamName => {
     const lbl = document.createElement('label')
     const cb  = document.createElement('input')
-    cb.type = 'checkbox';  cb.value = teamName
+    cb.type = 'checkbox'
+    cb.value = teamName
     cb.onchange = () => {
       importBtn.disabled = tf.querySelectorAll('input:checked').length === 0
     }
@@ -128,11 +134,12 @@ importBtn.addEventListener('click', () => {
     document.querySelectorAll('#teamForm input:checked')
   ).map(cb => cb.value)
 
-  const rows = tablesByName[selectedRaceName]
-                .filter(r => pickedTeams.includes(r.TEAM))
+  const rows = tablesByName[selectedRaceName].filter(r =>
+    pickedTeams.includes(r.TEAM)
+  )
 
   rows.forEach(r => {
-    const time = r.TIME + (adjustSec / 60)
+    const time = r.TIME + adjustSec / 60
     const runner = new Runner(r.NAME, r.PLACE, time)
     let team = meet.teams.find(t => t.name === r.TEAM)
     if (!team) {
@@ -143,13 +150,23 @@ importBtn.addEventListener('click', () => {
   })
 
   // recalc effectivePlace & team‐scores
-  const all = meet.teams.flatMap(t=>t.runners)
-  all.sort((a,b)=>a.time - b.time)
-     .forEach((r,i)=> r.effectivePlace = i + 1)
+  const all = meet.teams.flatMap(t => t.runners)
+  all.sort((a, b) => a.time - b.time).forEach((r, i) => {
+    r.effectivePlace = i + 1
+  })
 
   meet.calculateAllTeamScores()
 
+  // enable preview if we have data
   previewBtn.disabled = all.length === 0
+
+  // --- RESET FORM FIELDS ---
+  document.getElementById('urlInput').value = ''
+  document.getElementById('adjustInput').value = '0'
+  toTeams.disabled    = true
+  importBtn.disabled  = true
+
+  // go back to step 1
   step3.classList.add('hidden')
   step1.classList.remove('hidden')
 
@@ -171,8 +188,6 @@ previewBtn.addEventListener('click', () => {
     }))
   }
 
-  // ← **store in localStorage** instead of sessionStorage
   localStorage.setItem('virtualMeet', JSON.stringify(snapshot))
-
   window.location.href = 'preview.html'
 })
