@@ -9,35 +9,41 @@
     <h1>Virtual Meet Preview</h1>
 
     <div class="tables-container">
+      <!-- INDIVIDUALS -->
       <div class="individual-container">
         <h2>Runners</h2>
-        <table id="ind-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Place</th>
-              <th>Name</th>
-              <th>Team</th>
-              <th>Time (min)</th>
-              <th>Points</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-wrapper">
+          <table id="ind-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Place</th>
+                <th>Name</th>
+                <th>Team</th>
+                <th>Time (min)</th>
+                <th>Points</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
+      <!-- TEAM SCORES -->
       <div class="team-container">
         <h2>Team Scores</h2>
-        <table id="team-table">
-          <thead>
-            <tr>
-              <th>Place</th>
-              <th>Team</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-wrapper">
+          <table id="team-table">
+            <thead>
+              <tr>
+                <th>Place</th>
+                <th>Team</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -45,7 +51,13 @@
     <form id="addRunnerForm" class="add-runner-form">
       <input id="newName" type="text" placeholder="Name" required />
       <input id="newTeam" type="text" placeholder="Team" required />
-      <input id="newPlace" type="number" placeholder="Place" min="1" required />
+      <input
+        id="newPlace"
+        type="number"
+        placeholder="Place"
+        min="1"
+        required
+      />
       <button type="submit">Add Runner</button>
     </form>
 

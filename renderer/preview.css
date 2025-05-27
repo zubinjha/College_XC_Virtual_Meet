@@ -1,54 +1,61 @@
+/* renderer/preview.css */
+
+/* Body styling */
 body {
   font-family: sans-serif;
   padding: 20px;
 }
 
+/* Page title */
 h1 {
   font-size: 1.75rem;
   margin-bottom: 1rem;
 }
 
-/* give the individual table more room */
+/* give the individual and team containers room side-by-side */
 .tables-container {
   display: flex;
   gap: 20px;
 }
 
+/* Containers become column flexboxes */
 .individual-container,
 .team-container {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
-  padding: 12px;
+  margin: 0;
+  /* same max-height you had before */
+  max-height: 75vh;
+}
+
+/* Section titles sit at the top */
+.individual-container h2,
+.team-container h2 {
+  margin: 0;
+  padding: 8px;
+  background: white;
+  font-size: 1rem;
+}
+
+/* Only this wrapper scrolls */
+.table-wrapper {
+  flex: 1;            /* fills remaining space under the H2 */
   overflow-y: auto;
 }
 
-.individual-container {
-  flex: 3;            /* was 2, now a bit wider */
-  max-height: 75vh;
+/* Tables fill their wrapper */
+.table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.team-container {
-  flex: 1;
-  max-height: 75vh;
-}
-
-/* keep section titles frozen at top */
-.individual-container h2,
-.team-container h2 {
+/* Sticky table headers at top of scrollable area */
+.table-wrapper thead th {
   position: sticky;
   top: 0;
-  margin: 0 0 8px;
-  padding: 8px 0;
-  background: white;
-  z-index: 3;
-}
-
-/* table header sticky just below the h2 */
-thead th {
-  position: sticky;
-  top: 40px;          /* height of h2 + margin */
   background: #f3f3f1;
   color: #2e662b;
   font-weight: bold;
@@ -57,12 +64,7 @@ thead th {
   z-index: 2;
 }
 
-/* basic table styling */
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
+/* Body rows styling */
 tbody td {
   padding: 6px 8px;
   border-bottom: 1px solid #eee;
@@ -73,7 +75,7 @@ tbody tr:nth-child(even) {
   background: #fafafa;
 }
 
-/* delete button styling */
+/* Delete button styling */
 .delete-btn {
   cursor: pointer;
   border: none;
@@ -84,7 +86,7 @@ tbody tr:nth-child(even) {
   color: #c00;
 }
 
-/* Add-runner form */
+/* Add-runner form styling */
 .add-runner-form {
   margin-top: 16px;
   display: flex;
