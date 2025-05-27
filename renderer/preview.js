@@ -101,6 +101,18 @@ const inpName = document.getElementById('newName');
 const inpTeam = document.getElementById('newTeam');
 const inpPlace = document.getElementById('newPlace');
 
+// ------------------------------------------------------------------
+// Format decimal-minutes to mm:ss.d
+// ------------------------------------------------------------------
+function formatTime(t) {
+  const minInt = Math.floor(t);
+  const secondsTotal = (t - minInt) * 60;
+  const secInt = Math.floor(secondsTotal);
+  const tenths = Math.floor((secondsTotal - secInt) * 10);
+  const secStr = secInt.toString().padStart(2, '0');
+  return `${minInt}:${secStr}.${tenths}`;
+}
+
 // render everything
 function render() {
   meet.recalcAll();
@@ -171,7 +183,7 @@ function render() {
 
     // Time (read-only)
     const tdTi = document.createElement('td');
-    tdTi.textContent = r.time.toFixed(3);
+    tdTi.textContent = formatTime(r.time);
     tr.appendChild(tdTi);
 
     // Points (read-only)
