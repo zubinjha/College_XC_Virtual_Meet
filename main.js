@@ -30,6 +30,14 @@ ipcMain.handle('scrape-url', async (_, url) => {
 });
 
 ipcMain.handle('save-meet', async (_, { individuals, teams }) => {
+  // First, sort individuals by Place (ascending)
+  individuals.sort((a, b) => {
+    // ensure numeric comparison (empty or missing Place → Infinity)
+    const pa = typeof a.Place === 'number' ? a.Place : Infinity;
+    const pb = typeof b.Place === 'number' ? b.Place : Infinity;
+    return pa - pb;
+  });
+
   // 1) Prompt for save location
   const { filePath, canceled } = await dialog.showSaveDialog({
     title: 'Save Virtual Meet as Excel',
@@ -82,18 +90,18 @@ ipcMain.handle('save-meet', async (_, { individuals, teams }) => {
     }
     ws['!freeze'] = { xSplit: '1', ySplit: '1' };
 
-    // 5) Set column widths: A=7.5, B=20, C=15, D=10, E=7.5, F,G untouched, H=15, I=7.5
+    // 5) Set column widths: A=7.5, B=20, C=15, D=10, E=7.5, F,G untouched, H=7.5, I=15, J=7.5
     ws['!cols'] = [
       { wch: 7.5 },   // A
       { wch: 20   },  // B
       { wch: 15   },  // C
       { wch: 10   },  // D
       { wch: 7.5  },  // E
-      {},            // F
-      { wch: 7.5  },  // G (blank spacer)
-      { wch: 7.5   },  // H (team Place)
-      { wch: 15  },  // I (team Name)
-      {}             // J (team Score)
+      {},             // F
+      { wch: 7.5  },  // G (spacer)
+      { wch: 7.5  },  // H (team Place)
+      { wch: 15   },  // I (team Name)
+      { wch: 7.5  }   // J (team Score)
     ];
 
     // 6) Append, write, and save

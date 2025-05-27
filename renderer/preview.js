@@ -164,6 +164,11 @@ function render() {
       adjustTimeByPlace(r, newPlace, allRunners);
       render();
     });
+    // ensure click brings window + input focus
+    inpP.addEventListener('click', () => {
+      window.focus();
+      inpP.focus();
+    });
     tdP.appendChild(inpP);
     tr.appendChild(tdP);
 
@@ -203,7 +208,7 @@ function render() {
   });
 }
 
-// add‐runner form handler
+// add-runner form handler
 form.addEventListener('submit', e => {
   e.preventDefault();
   const name = inpName.value.trim();
@@ -250,6 +255,18 @@ function adjustTimeByPlace(runner, newPlace, sortedAll) {
     runner.time = (timeAt(newPlace - 2) + timeAt(newPlace - 1)) / 2;
   }
 }
+
+// when the window gets OS-focus back, auto-focus the name field
+window.addEventListener('focus', () => {
+  const first = document.getElementById('newName');
+  if (first) first.focus();
+});
+
+// also clicks anywhere in the body should bring window focus
+document.body.addEventListener('mousedown', () => {
+  window.focus();
+});
+
 
 // initial render
 render();
