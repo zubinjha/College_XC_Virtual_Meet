@@ -1,7 +1,7 @@
 {
-  "name": "xc_web_app",
+  "name": "college_xc_virtual_meet",
   "version": "1.0.0",
-  "description": "Cross Country Application",
+  "description": "Cross Country Virtual Meet Preview & Export",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -31,8 +31,8 @@
     "xlsx": "^0.18.5"
   },
   "build": {
-    "appId": "com.zubinjha.xcwebapp",
-    "productName": "XC Web App",
+    "appId": "com.zubinjha.collegexcvirtualmeet",
+    "productName": "College XC Virtual Meet",
     "directories": {
       "output": "dist"
     },

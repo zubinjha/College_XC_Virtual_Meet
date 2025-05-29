@@ -1,0 +1,4 @@
+// Always quit the app when all windows are closed
+app.on('window-all-closed', () => {
+  app.quit();
+});
