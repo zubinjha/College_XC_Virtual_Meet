@@ -1,14 +1,14 @@
 // renderer/index.js
 
-// only bridge we need here:
+// Need bridge to scrape meet
 const { scrapeMeet } = window.api
 
-// — your in-memory model classes —
+// Memory Classes for storing meet representation 
 class Runner {
   constructor(name, place, time) {
     this.name = name
     this.place = place
-    this.time = time    // minutes (float)
+    this.time = time    // Stored as minutes as a float, needs to be converted on render to normal format
     this.effectivePlace = null
     this.points = null
   }
@@ -166,7 +166,7 @@ importBtn.addEventListener('click', () => {
   toTeams.disabled    = true
   importBtn.disabled  = true
 
-  // go back to step 1
+  // go back to step 1, with blue button on
   step3.classList.add('hidden')
   step1.classList.remove('hidden')
 

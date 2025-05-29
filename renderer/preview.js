@@ -1,5 +1,3 @@
-// renderer/preview.js
-
 // ← pull from localStorage
 const raw = localStorage.getItem('virtualMeet');
 if (!raw) {
@@ -9,7 +7,7 @@ if (!raw) {
 }
 const snapshot = JSON.parse(raw);
 
-// — model classes (unchanged) —
+// Model Classes for storing running meet representation
 class Runner {
   constructor(name, place, time, eff, pts, team) {
     this.name = name;
@@ -85,10 +83,10 @@ class Meet {
   }
 }
 
-// build meet
+// build meet object represenation from snapshot
 const meet = new Meet(snapshot);
 
-// Hook up the existing “Save as Excel” button
+// Hook up the existing “Save as Excel” button to the corresponding logic
 const saveBtn = document.getElementById('saveExcelBtn');
 saveBtn.addEventListener('click', async () => {
   const individuals = meet.teams
@@ -120,7 +118,7 @@ const inpName = document.getElementById('newName');
 const inpTeam = document.getElementById('newTeam');
 const inpPlace = document.getElementById('newPlace');
 
-// Format decimal-minutes to mm:ss.d
+// Format decimal-minutes to mm:ss.d (Could add logic to handle hours too but will do another time)
 function formatTime(t) {
   const minInt = Math.floor(t);
   const secondsTotal = (t - minInt) * 60;
@@ -256,17 +254,15 @@ function adjustTimeByPlace(runner, newPlace, sortedAll) {
   }
 }
 
-// when the window gets OS-focus back, auto-focus the name field
+// when the window gets OS-focus back, auto-focus the name field and clicks anywhere in the body should bring window focus
 window.addEventListener('focus', () => {
   const first = document.getElementById('newName');
   if (first) first.focus();
 });
 
-// also clicks anywhere in the body should bring window focus
 document.body.addEventListener('mousedown', () => {
   window.focus();
 });
 
-
-// initial render
+// Initial render
 render();

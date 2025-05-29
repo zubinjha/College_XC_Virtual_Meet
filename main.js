@@ -1,5 +1,3 @@
-// main.js
-
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -30,15 +28,15 @@ ipcMain.handle('scrape-url', async (_, url) => {
 });
 
 ipcMain.handle('save-meet', async (_, { individuals, teams }) => {
-  // First, sort individuals by Place (ascending)
+  // Sort individuals by place
   individuals.sort((a, b) => {
-    // ensure numeric comparison (empty or missing Place → Infinity)
+    // ensure numeric comparison (empty or missing Place means Infinity/assume bad)
     const pa = typeof a.Place === 'number' ? a.Place : Infinity;
     const pb = typeof b.Place === 'number' ? b.Place : Infinity;
     return pa - pb;
   });
 
-  // 1) Prompt for save location
+  // 1) Prompt for save location, with a default path
   const { filePath, canceled } = await dialog.showSaveDialog({
     title: 'Save Virtual Meet as Excel',
     defaultPath: 'virtual-meet.xlsx',
