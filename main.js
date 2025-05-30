@@ -10,6 +10,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1000,
     height: 800,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -17,6 +18,13 @@ function createWindow() {
     }
   });
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+}
+
+// parse a "M:SS.d" time into total seconds
+function parseTime(str) {
+  const [min, rest] = str.split(':');
+  const [sec, dec]  = rest.split('.');
+  return Number(min) * 60 + Number(sec) + Number(dec) / 10;
 }
 
 ipcMain.handle('scrape-url', async (_, url) => {
@@ -30,43 +38,40 @@ ipcMain.handle('scrape-url', async (_, url) => {
 });
 
 ipcMain.handle('save-meet', async (_, { individuals, teams }) => {
-  // First, sort individuals by their original Place (ascending)
-  individuals.sort((a, b) => {
-    const pa = typeof a.Place === 'number' ? a.Place : Infinity;
-    const pb = typeof b.Place === 'number' ? b.Place : Infinity;
-    return pa - pb;
+  // 1) sort by actual finish time
+  individuals.forEach(r => {
+    r._seconds = parseTime(r.Time);
   });
+  individuals.sort((a, b) => a._seconds - b._seconds);
 
-  // 1) Prompt for save location
+  // 2) prompt for file path
   const { filePath, canceled } = await dialog.showSaveDialog({
     title: 'Save Virtual Meet as Excel',
     defaultPath: 'virtual-meet.xlsx',
     filters: [{ name: 'Excel Workbook', extensions: ['xlsx'] }]
   });
-  if (canceled || !filePath) {
-    return { success: false, error: 'Save canceled' };
-  }
+  if (canceled || !filePath) return { success: false, error: 'Save canceled' };
 
   try {
-    // 2) Build a single sheet with BOTH tables side by side
-    const wb = XLSX.utils.book_new();
+    // 3) build the rows
+    const wb   = XLSX.utils.book_new();
     const rows = [];
 
-    // 2a) Header row: A–E = individuals, F–G blank, H–J = teams
+    // header row
     rows.push([
-      'Place', 'Name', 'Team', 'Time', 'Points',
-      '', '',
-      'Place', 'Team', 'Score'
+      'Place','Name','Team','Time','Points',
+      '','',
+      'Place','Team','Score'
     ]);
 
-    // 2b) Data rows: up to the longer of the two lists
+    // data rows
     const maxRows = Math.max(individuals.length, teams.length);
     for (let i = 0; i < maxRows; i++) {
       const ind  = individuals[i] || {};
       const team = teams[i]       || {};
 
       rows.push([
-        // <-- force Place to be row index + 1, ignoring ind.Place
+        // place = row index +1
         i + 1,
         ind.Name   || '',
         ind.Team   || '',
@@ -75,23 +80,22 @@ ipcMain.handle('save-meet', async (_, { individuals, teams }) => {
         '', '',
         team.Place != null ? team.Place : '',
         team.Team   || '',
-        team.Score != null ? team.Score : ''
+        team.Score  != null ? team.Score  : ''
       ]);
     }
 
-    // 3) Convert rows to a worksheet
+    // 4) to worksheet
     const ws = XLSX.utils.aoa_to_sheet(rows);
 
-    // 4) Bold the top row and freeze it
+    // 5) bold + freeze header
     const range = XLSX.utils.decode_range(ws['!ref']);
     for (let C = range.s.c; C <= range.e.c; ++C) {
       const cellRef = XLSX.utils.encode_cell({ r: 0, c: C });
-      if (!ws[cellRef]) continue;
-      ws[cellRef].s = { font: { bold: true } };
+      if (ws[cellRef]) ws[cellRef].s = { font: { bold: true } };
     }
     ws['!freeze'] = { xSplit: '1', ySplit: '1' };
 
-    // 5) Set column widths
+    // 6) column widths
     ws['!cols'] = [
       { wch: 7.5 },   // A
       { wch: 20   },  // B
@@ -105,7 +109,7 @@ ipcMain.handle('save-meet', async (_, { individuals, teams }) => {
       { wch: 7.5  }   // J
     ];
 
-    // 6) Append sheet and save
+    // 7) append + write
     XLSX.utils.book_append_sheet(wb, ws, 'Virtual Meet');
     const wbout = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
     fs.writeFileSync(filePath, wbout);
@@ -119,7 +123,8 @@ ipcMain.handle('save-meet', async (_, { individuals, teams }) => {
 
 app.whenReady().then(createWindow);
 
-// Always quit when all windows are closed
+// quit when all windows close
 app.on('window-all-closed', () => {
   app.quit();
 });
+
