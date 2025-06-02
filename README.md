@@ -16,7 +16,7 @@ Choose the version that matches your system:
 
 ## What It Does
 
-Different cross country courses can vary a lot in speed and difficulty. This makes comparing results from different races tricky. This tool helps coaches simulate upcoming championship meets by combining past performances and adjusting for time differences.
+Cross country courses and races can vary significantly in speed. This tool helps preview upcoming meets by combining multiple race performances and adjusting for course speed differences.
 
 You give the app one or more TFRRS links, select which teams to include, apply optional time adjustments (for example, +7 seconds), and it builds a virtual meet for you.
 
@@ -33,7 +33,7 @@ Note: Runners added manually won’t count towards team scores until the team ha
 
 ## Screenshots & Walkthrough
 
-Below are the main steps, with screenshots showing each part. (Names and team labels have been blurred for privacy.)
+Below are the main steps, with screenshots showing each part. 
 
 ### 1. Main Screen
 
@@ -81,6 +81,7 @@ You can also export the results to Excel at any point.
 
 - The screenshots show redacted names and team labels for privacy.
 - Exported Excel files include individual results and team scores side by side.
+- On Windows, the text fields can occasionally be buggy. If this happens, try clicking outside the application and then back into it before typing.
 
 ---
 
