@@ -82,7 +82,3 @@ You can also export the results to Excel at any point.
 - The screenshots show redacted names and team labels for privacy.
 - Exported Excel files include individual results and team scores side by side.
 - On Windows, the text fields can occasionally be buggy. If this happens, try clicking outside the application and then back into it before typing.
-
----
-
-This tool was made by Zubin Jha.
