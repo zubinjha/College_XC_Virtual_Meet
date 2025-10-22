@@ -1,0 +1,96 @@
+/* Global resets & spacing */
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+
+label,
+input,
+button {
+  margin: 8px 0;
+}
+
+/* Utility classes */
+.hidden {
+  display: none;
+}
+
+.error {
+  color: red;
+  margin-top: 4px;
+}
+
+/* STEP 2 & 3 lists: vertical, radio/checkbox on left */
+#raceForm label,
+#teamForm label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  user-select: none;
+}
+
+#raceForm label input,
+#teamForm label input {
+  margin-right: 8px;
+}
+
+/* scrollable teams list */
+#teamForm {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Base button styling for both Load & Preview */
+button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  line-height: 1.2;
+  cursor: pointer;
+  background-color: white;
+  color: #333;
+  transition: background-color 0.15s ease;
+}
+
+button:hover:enabled {
+  background-color: #f0f0f0;
+}
+
+/* Disabled state (both buttons) */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Only override color for the “Preview” button when enabled */
+#previewBtn:enabled {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+#previewBtn:enabled:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+/* ——— preview.html panels ——— */
+
+#container { display: flex; height: 100vh; }
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  margin: 10px;
+}
+.table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0 10px 10px;
+}
+/* make team panel a bit narrower */
+#team-panel { max-width: 300px; }
+
+

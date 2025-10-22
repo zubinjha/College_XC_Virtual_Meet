@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "web": "node server/index.js",
     "dist:mac-arm64": "electron-builder --mac --arm64",
     "dist:mac-intel": "electron-builder --mac --x64",
     "dist:mac-universal": "electron-builder --mac --universal",
@@ -30,6 +31,7 @@
     "cheerio": "^1.0.0",
     "electron-dialog": "^2.0.0",
     "exceljs": "^4.4.0",
+    "express": "^5.1.0",
     "xlsx": "^0.18.5"
   },
   "build": {
@@ -46,14 +48,19 @@
       "package.json"
     ],
     "mac": {
-      "target": ["dmg"],
+      "target": [
+        "dmg"
+      ],
       "icon": "build/logo.png"
     },
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64", "ia32"]
+          "arch": [
+            "x64",
+            "ia32"
+          ]
         },
         "zip"
       ],
