@@ -2,6 +2,31 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+// Build realistic browser-like headers to avoid basic scraper blocks
+function buildRequestHeaders(targetUrl) {
+  let referer = targetUrl;
+  try {
+    const u = new URL(targetUrl);
+    // Many sites just check that the referer is same-origin
+    referer = u.origin;
+  } catch (_) {
+    // If URL parsing fails, just send the full URL as referer
+  }
+
+  return {
+    'User-Agent':
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+    'Accept':
+      'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+    'Referer': referer,
+    'DNT': '1',
+    'Upgrade-Insecure-Requests': '1'
+  };
+}
+
 // Convert "mm:ss.s" to float minutes
 function parseTimeToMinutes(timeStr) {
   if (!timeStr || typeof timeStr !== 'string') return null;
@@ -21,7 +46,10 @@ function parseTimeToMinutes(timeStr) {
 
 async function scrapeMeet(url) {
   try {
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      headers: buildRequestHeaders(url),
+      timeout: 30000
+    });
     const html = response.data;
     const $ = cheerio.load(html);
 
