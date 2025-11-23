@@ -162,8 +162,8 @@ tbody tr:hover {
 
 .add-runner-form {
   flex: 1;
-  min-width: 260px;
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   background: #ffffff;
@@ -180,6 +180,7 @@ tbody tr:hover {
   border-radius: 8px;
   background: var(--color-input-bg);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  flex: 1 1 160px;
 }
 
 .add-runner-form input:focus {
@@ -211,7 +212,6 @@ tbody tr:hover {
   display: flex;
   gap: 12px;
   align-items: center;
-  min-width: 200px;
 }
 
 #saveExcelBtn {
@@ -281,6 +281,11 @@ tbody tr:hover {
 
   .runner-buttons {
     flex-direction: column;
+    width: 100%;
+  }
+
+  .runner-buttons button {
+    width: 100%;
   }
 }
 
@@ -292,5 +297,16 @@ tbody tr:hover {
 
   .runner-actions-spacer {
     display: none;
+  }
+
+  .add-runner-form {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .add-runner-form input,
+  .add-runner-form button {
+    width: 100%;
+    flex: 1 1 auto;
   }
 }
