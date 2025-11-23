@@ -57,6 +57,8 @@ class Meet {
 // — state & refs —
 let tablesByName = {}
 let selectedRaceName = ''
+let currentMeetMeta = null
+const importedRaces = []
 const meet = new Meet()
 
 const step1      = document.getElementById('step1')
@@ -67,6 +69,71 @@ const previewBtn = document.getElementById('previewBtn')
 const toTeams    = document.getElementById('toTeams')
 const importBtn  = document.getElementById('importBtn')
 const errDiv     = document.getElementById('step1Error')
+const summarySection = document.getElementById('importSummary')
+const summaryList = document.getElementById('importList')
+
+const formatAdjustment = secs => {
+  const val = Number(secs) || 0
+  if (!val) return 'Adjustment: +0s'
+  const prefix = val > 0 ? '+' : ''
+  return `Adjustment: ${prefix}${val}s`
+}
+
+function renderImportedRaces() {
+  if (!summarySection || !summaryList) return
+  if (!importedRaces.length) {
+    summarySection.classList.add('hidden')
+    summaryList.innerHTML = '<p class="import-empty">No races imported yet.</p>'
+    return
+  }
+
+  summarySection.classList.remove('hidden')
+  summaryList.innerHTML = ''
+  importedRaces.forEach(entry => {
+    const card = document.createElement('article')
+    card.className = 'import-card'
+
+    const header = document.createElement('div')
+    header.className = 'import-card-header'
+
+    const info = document.createElement('div')
+    const meetEl = document.createElement('div')
+    meetEl.className = 'import-meet'
+    meetEl.textContent = entry.meetName
+    const raceEl = document.createElement('div')
+    raceEl.className = 'import-race'
+    raceEl.textContent = entry.raceName
+    info.appendChild(meetEl)
+    info.appendChild(raceEl)
+
+    const dateEl = document.createElement('div')
+    dateEl.className = 'import-date'
+    dateEl.textContent = formatAdjustment(entry.adjustment)
+
+    header.appendChild(info)
+    header.appendChild(dateEl)
+
+    const list = document.createElement('ul')
+    list.className = 'import-team-list'
+    if (entry.teams.length === 0) {
+      const li = document.createElement('li')
+      li.textContent = 'No teams selected'
+      list.appendChild(li)
+    } else {
+      entry.teams.forEach(team => {
+        const li = document.createElement('li')
+        li.textContent = team
+        list.appendChild(li)
+      })
+    }
+
+    card.appendChild(header)
+    card.appendChild(list)
+    summaryList.appendChild(card)
+  })
+}
+
+renderImportedRaces()
 
 // STEP 1 → load & scrape
 loadBtn.addEventListener('click', async () => {
@@ -80,6 +147,10 @@ loadBtn.addEventListener('click', async () => {
   }
 
   tablesByName = res.data.tables
+  currentMeetMeta = {
+    name: res.data.name || 'Imported Meet',
+    date: res.data.date || ''
+  }
 
   // build the race‐radio list
   const rf = document.getElementById('raceForm')
@@ -160,6 +231,14 @@ importBtn.addEventListener('click', () => {
   // enable preview if we have data
   previewBtn.disabled = all.length === 0
 
+  importedRaces.push({
+    meetName: (currentMeetMeta && currentMeetMeta.name) || 'Imported Meet',
+    raceName: selectedRaceName || 'Race',
+    adjustment: adjustSec,
+    teams: pickedTeams.slice().sort((a, b) => a.localeCompare(b))
+  })
+  renderImportedRaces()
+
   // --- RESET FORM FIELDS ---
   document.getElementById('urlInput').value = ''
   document.getElementById('adjustInput').value = '0'
@@ -169,8 +248,6 @@ importBtn.addEventListener('click', () => {
   // go back to step 1, with blue button on
   step3.classList.add('hidden')
   step1.classList.remove('hidden')
-
-  alert(`Imported ${rows.length} runners.\nTotal now: ${all.length}`)
 })
 
 // “Preview Virtual Meet”

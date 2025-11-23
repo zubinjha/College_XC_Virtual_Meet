@@ -10,13 +10,10 @@
   <body>
     <h1>Virtual Meet Preview</h1>
 
-    <!-- Save button -->
-    <button id="saveExcelBtn">💾 Save as Excel</button>
-
     <div class="tables-container">
       <!-- INDIVIDUALS -->
       <div class="individual-container">
-        <h2>Runners</h2>
+        <h2>Individuals</h2>
         <div class="table-wrapper">
           <table id="ind-table">
             <thead>
@@ -52,19 +49,31 @@
       </div>
     </div>
 
-    <!-- Add-Runner form always visible below -->
-    <form id="addRunnerForm" class="add-runner-form">
-      <input id="newName" type="text" placeholder="Name" required autofocus />
-      <input id="newTeam" type="text" placeholder="Team" required />
-      <input
-        id="newPlace"
-        type="number"
-        placeholder="Place"
-        min="1"
-        required
-      />
-      <button type="submit">Add Runner</button>
-    </form>
+    <!-- Runner actions -->
+    <div class="runner-actions-spacer"></div>
+    <div class="runner-actions">
+      <form id="addRunnerForm" class="add-runner-form">
+        <input id="newName" type="text" placeholder="Name" required autofocus />
+        <input id="newTeam" type="text" placeholder="Team" required />
+        <input
+          id="newPlace"
+          type="number"
+          placeholder="Place"
+          min="1"
+          required
+        />
+        <button type="submit">Add Runner</button>
+      </form>
+      <div class="runner-buttons">
+        <button id="saveExcelBtn" type="button">
+          <span class="icon" aria-hidden="true">💾</span>
+          <span>Save as Excel</span>
+        </button>
+        <button id="backHomeBtn" type="button" class="ghost-btn">
+          ← Back to Import
+        </button>
+      </div>
+    </div>
 
     <script src="web-api.js"></script>
     <script src="preview.js"></script>

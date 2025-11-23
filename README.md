@@ -1,16 +1,22 @@
 # College XC Virtual Meet
 
-This is a desktop app designed for previewing and exporting cross country meet results from TFRRS. It’s helpful for coaches to simulate upcoming meets based on previous performances.
+This project is now a browser-based web app for previewing and exporting cross country meet results from TFRRS. It’s helpful for coaches to simulate upcoming meets based on previous performances without installing a desktop client.
 
 ---
 
-## Downloads
+## Getting Started
 
-Choose the version that matches your system:
+1. Install dependencies: `npm install`
+2. Start the dev server (auto-restarts on changes): `npm run dev`
+3. Open your browser to [http://localhost:3000](http://localhost:3000)
 
-- **macOS (Apple Silicon)** → [Download](https://github.com/zubinjha/College_XC_Virtual_Meet/releases)
-- **macOS (Intel)** → [Download](https://github.com/zubinjha/College_XC_Virtual_Meet/releases)
-- **Windows (64-bit)** → [Download](https://github.com/zubinjha/College_XC_Virtual_Meet/releases)
+To run the server without watch mode (or when deploying): `npm start`
+
+---
+
+## Building for Deployment
+
+`npm run build` creates a `dist/` folder containing the Express server (`server/`), scraper helper (`scraper/`), and the static frontend (`renderer/`). Deploy by copying `dist/` to your host and running `node dist/server/index.js`.
 
 ---
 

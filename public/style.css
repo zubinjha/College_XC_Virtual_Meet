@@ -1,13 +1,25 @@
-/* Global resets & spacing */
-body {
-  font-family: sans-serif;
-  padding: 20px;
+:root {
+  --color-graphite: #333333;
+  --color-azure: #3083dc;
+  --color-soft-bg: #f5f6f8;
+  --color-input-bg: #f1f2f5;
 }
 
-label,
-input,
-button {
-  margin: 8px 0;
+/* Global layout */
+body {
+  font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont,
+    "Helvetica Neue", sans-serif;
+  padding: 40px;
+  background: var(--color-soft-bg);
+  color: var(--color-graphite);
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 24px;
+  color: var(--color-graphite);
+  font-weight: 600;
 }
 
 /* Utility classes */
@@ -16,81 +28,213 @@ button {
 }
 
 .error {
-  color: red;
-  margin-top: 4px;
+  color: #c03532;
+  margin-top: 6px;
 }
 
-/* STEP 2 & 3 lists: vertical, radio/checkbox on left */
+/* Step cards */
+#step1,
+#step2,
+#step3 {
+  background: #ffffff;
+  border: 1px solid rgba(51, 51, 51, 0.08);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 32px rgba(51, 51, 51, 0.1);
+}
+
+#step2 h2,
+#step3 h2 {
+  margin-top: 0;
+  color: var(--color-graphite);
+  font-size: 1.1rem;
+}
+
+label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-graphite);
+}
+
+input[type='text'],
+input[type='number'] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(51, 51, 51, 0.2);
+  background: var(--color-input-bg);
+  font-size: 1rem;
+  color: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type='text']:focus,
+input[type='number']:focus {
+  outline: none;
+  border-color: var(--color-azure);
+  box-shadow: 0 0 0 3px rgba(48, 131, 220, 0.25);
+}
+
+/* Buttons */
+button {
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  background: var(--color-azure);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(48, 131, 220, 0.25);
+}
+
+button:hover:enabled {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(48, 131, 220, 0.35);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+#previewBtn {
+  background: var(--color-graphite);
+  color: var(--color-soft-bg);
+  box-shadow: 0 6px 18px rgba(51, 51, 51, 0.35);
+}
+
+#previewBtn:hover:enabled {
+  box-shadow: 0 10px 26px rgba(51, 51, 51, 0.4);
+}
+
+/* Lists for races/teams */
 #raceForm label,
 #teamForm label {
   display: flex;
   align-items: center;
-  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid transparent;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
   user-select: none;
+}
+
+#raceForm label:hover,
+#teamForm label:hover {
+  border-color: rgba(48, 131, 220, 0.5);
+  background: rgba(48, 131, 220, 0.1);
 }
 
 #raceForm label input,
 #teamForm label input {
-  margin-right: 8px;
+  margin-right: 10px;
+  accent-color: var(--color-azure);
 }
 
 /* scrollable teams list */
 #teamForm {
-  max-height: 300px;
+  max-height: 320px;
   overflow-y: auto;
+  padding-right: 4px;
 }
 
-/* Base button styling for both Load & Preview */
-button {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-  line-height: 1.2;
-  cursor: pointer;
-  background-color: white;
-  color: #333;
-  transition: background-color 0.15s ease;
+/* Inline step actions */
+#step2 button,
+#step3 button,
+#step1 button {
+  margin-top: 16px;
 }
 
-button:hover:enabled {
-  background-color: #f0f0f0;
+@media (max-width: 720px) {
+  body {
+    padding: 24px;
+  }
+
+  button {
+    width: 100%;
+  }
 }
 
-/* Disabled state (both buttons) */
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* Imported races summary */
+.import-summary {
+  background: #ffffff;
+  border: 1px solid rgba(51, 51, 51, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 6px 20px rgba(51, 51, 51, 0.08);
 }
 
-/* Only override color for the “Preview” button when enabled */
-#previewBtn:enabled {
-  background-color: #007bff;
-  color: white;
-  border-color: #007bff;
+.import-summary h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+  color: var(--color-graphite);
 }
 
-#previewBtn:enabled:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
-}
-
-/* ——— preview.html panels ——— */
-
-#container { display: flex; height: 100vh; }
-.panel {
-  flex: 1;
+.import-list {
   display: flex;
   flex-direction: column;
-  border: 1px solid #ddd;
-  margin: 10px;
+  gap: 16px;
 }
-.table-wrapper {
-  flex: 1;
-  overflow-y: auto;
-  margin: 0 10px 10px;
+
+.import-card {
+  border: 1px solid rgba(51, 51, 51, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.9);
 }
-/* make team panel a bit narrower */
-#team-panel { max-width: 300px; }
 
+.import-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
 
+.import-meet {
+  font-weight: 600;
+  color: var(--color-graphite);
+}
+
+.import-race {
+  font-size: 0.9rem;
+  color: rgba(51, 51, 51, 0.75);
+}
+
+.import-date {
+  font-size: 0.85rem;
+  color: rgba(51, 51, 51, 0.6);
+}
+
+.import-team-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.import-team-list li {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(48, 131, 220, 0.1);
+  color: var(--color-graphite);
+  font-size: 0.85rem;
+}
+
+.import-empty {
+  margin: 0;
+  color: rgba(51, 51, 51, 0.6);
+  font-size: 0.9rem;
+}

@@ -142,7 +142,8 @@ function render() {
 
     // delete button
     const del = document.createElement('td');
-    del.innerHTML = `<button class="delete-btn">🗑️</button>`;
+    del.innerHTML =
+      '<button class="delete-btn" type="button" aria-label="Delete runner">Delete</button>';
     del.querySelector('button').onclick = () => {
       const team = meet.teams.find(t => t.name === r.team);
       if (team) team.runners = team.runners.filter(x => x !== r);
@@ -263,6 +264,13 @@ window.addEventListener('focus', () => {
 document.body.addEventListener('mousedown', () => {
   window.focus();
 });
+
+const backBtn = document.getElementById('backHomeBtn');
+if (backBtn) {
+  backBtn.addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
+}
 
 // Initial render
 render();

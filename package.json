@@ -2,14 +2,12 @@
   "name": "college_xc_virtual_meet",
   "version": "1.0.0",
   "description": "Cross Country Virtual Meet Preview & Export",
-  "main": "main.js",
+  "main": "server/index.js",
+  "type": "commonjs",
   "scripts": {
-    "start": "electron .",
-    "web": "node server/index.js",
-    "dist:mac-arm64": "electron-builder --mac --arm64",
-    "dist:mac-intel": "electron-builder --mac --x64",
-    "dist:mac-universal": "electron-builder --mac --universal",
-    "dist:win": "electron-builder --win"
+    "dev": "node --watch server/index.js",
+    "start": "node server/index.js",
+    "build": "node scripts/build.js"
   },
   "repository": {
     "type": "git",
@@ -22,49 +20,11 @@
     "url": "https://github.com/zubinjha/College_XC_Virtual_Meet/issues"
   },
   "homepage": "https://github.com/zubinjha/College_XC_Virtual_Meet#readme",
-  "devDependencies": {
-    "electron": "^36.3.1",
-    "electron-builder": "^26.0.12"
-  },
   "dependencies": {
     "axios": "^1.9.0",
     "cheerio": "^1.0.0",
-    "electron-dialog": "^2.0.0",
     "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "xlsx": "^0.18.5"
-  },
-  "build": {
-    "appId": "com.zubinjha.collegexcvirtualmeet",
-    "productName": "College XC Virtual Meet",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "main.js",
-      "preload.js",
-      "renderer/**/*",
-      "scraper/**/*",
-      "package.json"
-    ],
-    "mac": {
-      "target": [
-        "dmg"
-      ],
-      "icon": "build/logo.png"
-    },
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
-        },
-        "zip"
-      ],
-      "icon": "build/logo.png"
-    }
   }
 }
