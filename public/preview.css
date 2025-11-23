@@ -36,10 +36,12 @@ h1 {
 
 .individual-container {
   flex: 1 1 62%;
+  order: 2;
 }
 
 .team-container {
   flex: 1 1 32%;
+  order: 1;
 }
 
 /* Containers become column flexboxes */
@@ -209,6 +211,7 @@ tbody tr:hover {
   display: flex;
   gap: 12px;
   align-items: center;
+  min-width: 200px;
 }
 
 #saveExcelBtn {
@@ -262,6 +265,7 @@ tbody tr:hover {
   .team-container {
     width: 100%;
     max-height: none;
+    order: unset;
   }
 
   .runner-actions {
@@ -273,5 +277,20 @@ tbody tr:hover {
 
   .runner-actions > * {
     width: 100%;
+  }
+
+  .runner-buttons {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .runner-actions {
+    position: static;
+    padding-bottom: 16px;
+  }
+
+  .runner-actions-spacer {
+    display: none;
   }
 }
